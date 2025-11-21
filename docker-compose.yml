@@ -1,4 +1,18 @@
 services:
+
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: emil-server
+    restart: unless-stopped
+    ports:
+      - "8888:8888"
+    environment:
+      - APP_ENV=production
+    depends_on:
+      postgres:
+        condition: service_healthy
   postgres:
     image: postgres:15
     restart: unless-stopped
