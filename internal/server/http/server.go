@@ -46,11 +46,27 @@ func New(cfg config.ServerConfig, log logger.Logger, authService AuthService, me
 	e.HideBanner = true
 	e.HidePort = true
 
-	// Middleware
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"https://emilsuliman.com", "http://localhost:4200"},
-		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
-		AllowHeaders: []string{echo.HeaderAuthorization, echo.HeaderContentType},
+		AllowOrigins: []string{
+			"https://emilsuliman.com",
+			"https://www.emilsuliman.com",
+			"http://localhost:4200",
+		},
+		AllowMethods: []string{
+			http.MethodGet,
+			http.MethodPut,
+			http.MethodPost,
+			http.MethodDelete,
+			http.MethodOptions, // Add OPTIONS for preflight
+		},
+		AllowHeaders: []string{
+			echo.HeaderAuthorization,
+			echo.HeaderContentType,
+			echo.HeaderOrigin,
+			"X-Requested-With",
+		},
+		AllowCredentials: true,
+		MaxAge:           86400, // 24 hours - helps with preflight caching
 	}))
 
 	e.Use(middleware.Recover())
