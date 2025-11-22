@@ -40,8 +40,11 @@ func (s *messageService) CreateMessage(ctx context.Context, req *domain.CreateMe
 		Text:    req.Text,
 		Time:    time.Now(),
 		Unread:  true,
-		Country: "SYRIA",
+		City:    req.City,
+		Country: req.Country,
 	}
+
+	fmt.Println(message)
 
 	if err := s.messageRepository.Create(ctx, message); err != nil {
 		log.WithError(err).Error("failed to create message")

@@ -9,6 +9,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/lib/pq v1.10.9
+	github.com/oschwald/geoip2-golang v1.13.0
 	github.com/sirupsen/logrus v1.9.3
 	golang.org/x/crypto v0.38.0
 )
@@ -17,6 +18,7 @@ require (
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/oschwald/maxminddb-golang v1.13.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	golang.org/x/net v0.40.0 // indirect

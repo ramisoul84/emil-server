@@ -13,11 +13,14 @@ type Message struct {
 	Text    string    `json:"text" db:"text"`
 	Time    time.Time `json:"time" db:"time"`
 	Unread  bool      `json:"unread" db:"unread"`
+	City    string    `json:"city" db:"city"`
 	Country string    `json:"country" db:"country"`
 }
 
 type CreateMessageRequest struct {
-	Name  string `json:"name" validate:"required,email"`
-	Email string `json:"email" validate:"required"`
-	Text  string `json:"text" validate:"required"`
+	Name    string `json:"name" validate:"required,email"`
+	Email   string `json:"email" validate:"required"`
+	Text    string `json:"text" validate:"required"`
+	City    string `json:"city"`
+	Country string `json:"country"`
 }

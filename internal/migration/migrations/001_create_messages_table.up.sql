@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS messages (
     email VARCHAR(255) NOT NULL,
     text TEXT NOT NULL,
     time TIMESTAMP WITH TIME ZONE,
-    unread BOOLEAN NOT NULL DEFAULT TRUE,
+    unread BOOLEAN NOT NULL,
     country VARCHAR(100)
 );
 

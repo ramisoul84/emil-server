@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -10,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"gitlab.com/ramisoul/emil-server/internal/domain"
+	"gitlab.com/ramisoul/emil-server/pkg/location"
 	"gitlab.com/ramisoul/emil-server/pkg/logger"
 )
 
@@ -49,6 +51,18 @@ func (h *messageHandler) Create(c echo.Context) error {
 			"error": "Name and Email and Text are required",
 		})
 	}
+
+	info, err := location.GetFullClientInfo(c)
+
+	if err != nil {
+		req.Country = "Unknown"
+		req.City = "Unknown"
+	} else {
+		req.City = info.City
+		req.Country = info.Country
+	}
+
+	fmt.Println(info)
 
 	if err := h.messageService.CreateMessage(c.Request().Context(), req); err != nil {
 		log.WithError(err).Error("Failed to create message")
