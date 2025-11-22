@@ -27,7 +27,7 @@ func (r *messageRepository) Create(ctx context.Context, message *domain.Message)
 	})
 
 	query := `
-		INSERT INTO messages (id, name, email, text, time, unread, country)
+		INSERT INTO messages (id, name, email, text, time, unread,city, country)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 	`
 	_, err := r.db.ExecContext(ctx, query,
@@ -36,7 +36,7 @@ func (r *messageRepository) Create(ctx context.Context, message *domain.Message)
 		message.Email,
 		message.Text,
 		message.Time,
-		message.Unread,
+		message.Unread, message.City,
 		message.Country,
 	)
 

@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS messages (
     text TEXT NOT NULL,
     time TIMESTAMP WITH TIME ZONE,
     unread BOOLEAN NOT NULL,
+    city VARCHAR(100),
     country VARCHAR(100)
 );
 
