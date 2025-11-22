@@ -50,6 +50,7 @@ func New(cfg config.ServerConfig, log logger.Logger, authService AuthService, me
 		AllowOrigins: []string{
 			"https://emilsuliman.com",
 			"https://www.emilsuliman.com",
+			//"http://localhost:4200",
 		},
 		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
 		AllowHeaders: []string{

@@ -84,7 +84,7 @@ func (r *messageRepository) Update(ctx context.Context, id uuid.UUID) error {
 
 	query := `
 		UPDATE messages
-		SET unread = true
+		SET unread = false
 		WHERE id = $1
 	`
 

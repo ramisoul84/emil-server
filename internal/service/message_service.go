@@ -39,7 +39,7 @@ func (s *messageService) CreateMessage(ctx context.Context, req *domain.CreateMe
 		Email:   req.Email,
 		Text:    req.Text,
 		Time:    time.Now(),
-		Unread:  false,
+		Unread:  true,
 		Country: "SYRIA",
 	}
 
@@ -101,7 +101,7 @@ func (s *messageService) GetMessagesList(ctx context.Context, limit, offset int)
 	})
 
 	if limit <= 0 || limit > 100 {
-		limit = 20
+		limit = 10
 	}
 
 	if offset < 0 {
