@@ -47,7 +47,10 @@ func New(cfg config.ServerConfig, log logger.Logger, authService AuthService, me
 	e.HidePort = true
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"}, // Temporary: allow all origins
+		AllowOrigins: []string{
+			"https://emilsuliman.com",
+			"https://www.emilsuliman.com",
+		},
 		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
 		AllowHeaders: []string{
 			echo.HeaderOrigin,

@@ -28,7 +28,14 @@ func (h *authHandler) Login(c echo.Context) error {
 		"operation": "login",
 	})
 
-	var req *domain.LoginRequest
+	if c.Request().Body == nil {
+		log.Info("Empty request body")
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Request body is required",
+		})
+	}
+
+	var req domain.LoginRequest
 	if err := c.Bind(&req); err != nil {
 		log.WithError(err).Info("Invalid request body")
 		return c.JSON(http.StatusBadRequest, map[string]string{
