@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -28,8 +29,10 @@ type IPAPIResponse struct {
 }
 
 func GetFullClientInfo(c echo.Context) (*IPAPIResponse, error) {
-	ip := c.RealIP()
+	ip := GetRealClientIP(c)
+
 	fmt.Println("IP", ip)
+
 	if ip == "" {
 		return nil, fmt.Errorf("could not determine client IP")
 	}
@@ -55,4 +58,22 @@ func GetFullClientInfo(c echo.Context) (*IPAPIResponse, error) {
 	}
 
 	return &result, nil
+}
+
+func GetRealClientIP(c echo.Context) string {
+	// First try X-Real-IP (set by nginx)
+	if realIP := c.Request().Header.Get("X-Real-IP"); realIP != "" {
+		return realIP
+	}
+
+	// Then try X-Forwarded-For
+	if xff := c.Request().Header.Get("X-Forwarded-For"); xff != "" {
+		ips := strings.Split(xff, ",")
+		if len(ips) > 0 {
+			return strings.TrimSpace(ips[0]) // First IP is the original client
+		}
+	}
+
+	// Fallback
+	return c.RealIP()
 }
