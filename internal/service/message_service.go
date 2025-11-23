@@ -44,8 +44,6 @@ func (s *messageService) CreateMessage(ctx context.Context, req *domain.CreateMe
 		Country: req.Country,
 	}
 
-	fmt.Println(message)
-
 	if err := s.messageRepository.Create(ctx, message); err != nil {
 		log.WithError(err).Error("failed to create message")
 		return fmt.Errorf("failed to create message: %w", err)

@@ -28,20 +28,32 @@ type MessageService interface {
 	GetMessagesList(ctx context.Context, limit, offset int) ([]*domain.Message, int, error)
 }
 
+type AnalyticsService interface {
+	SaveVisitor(ctx context.Context, visitor *domain.Visitor) error
+	GetVisitors(ctx context.Context, limit, offset int) ([]*domain.Visitor, int, int, error)
+}
+
 type Tokener interface {
 	ValidateAccessToken(tokenString string) error
 }
 
 type Server struct {
-	echo           *echo.Echo
-	server         *http.Server
-	log            logger.Logger
-	authService    AuthService
-	messageService MessageService
-	jwt            Tokener
+	echo             *echo.Echo
+	server           *http.Server
+	log              logger.Logger
+	authService      AuthService
+	messageService   MessageService
+	analyticsService AnalyticsService
+	jwt              Tokener
 }
 
-func New(cfg config.ServerConfig, log logger.Logger, authService AuthService, messageService MessageService, jwt Tokener) *Server {
+func New(
+	cfg config.ServerConfig,
+	log logger.Logger,
+	authService AuthService,
+	messageService MessageService,
+	analyticsService AnalyticsService,
+	jwt Tokener) *Server {
 	e := echo.New()
 	e.HideBanner = true
 	e.HidePort = true
@@ -77,7 +89,7 @@ func New(cfg config.ServerConfig, log logger.Logger, authService AuthService, me
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	server := &Server{e, srv, log, authService, messageService, jwt}
+	server := &Server{e, srv, log, authService, messageService, analyticsService, jwt}
 
 	server.setupRoutes()
 
@@ -89,6 +101,7 @@ func (s *Server) setupRoutes() {
 
 	messageHandler := handlers.NewMessageHandler(s.messageService, s.log)
 	authHandler := handlers.NewAuthHandler(s.authService, s.log)
+	analyticsHandler := handlers.NewAnalyticsHandler(s.analyticsService, s.log)
 
 	message := api.Group("/message")
 
@@ -103,6 +116,10 @@ func (s *Server) setupRoutes() {
 
 	auth := api.Group("/auth")
 	auth.POST("/login", authHandler.Login)
+
+	analytics := api.Group("/analytics")
+	analytics.GET("/track", analyticsHandler.TrackVisitor)
+	analytics.GET("/visitors", analyticsHandler.GetVisitors)
 
 }
 

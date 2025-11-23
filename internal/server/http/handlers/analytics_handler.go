@@ -1,0 +1,109 @@
+package handlers
+
+import (
+	"context"
+	"net/http"
+	"strconv"
+
+	"github.com/labstack/echo/v4"
+	"gitlab.com/ramisoul/emil-server/internal/domain"
+	"gitlab.com/ramisoul/emil-server/pkg/location"
+	"gitlab.com/ramisoul/emil-server/pkg/logger"
+)
+
+type AnalyticsService interface {
+	SaveVisitor(ctx context.Context, visitor *domain.Visitor) error
+	GetVisitors(ctx context.Context, limit, offset int) ([]*domain.Visitor, int, int, error)
+}
+
+type analyticsHandler struct {
+	service AnalyticsService
+	log     logger.Logger
+}
+
+func NewAnalyticsHandler(service AnalyticsService, log logger.Logger) *analyticsHandler {
+	return &analyticsHandler{service, log}
+}
+
+func (h *analyticsHandler) TrackVisitor(c echo.Context) error {
+	log := h.log.WithFields(map[string]any{
+		"layer":     "handlers",
+		"operation": "track_visitor",
+	})
+
+	ip := c.RealIP()
+	userAgent := c.Request().UserAgent()
+
+	var visitor domain.Visitor
+
+	visitor.IP = ip
+	visitor.UserAgent = userAgent
+
+	info, err := location.GetFullClientInfo(c)
+
+	if err != nil {
+		visitor.Country = "Unknown"
+		visitor.City = "Unknown"
+	} else {
+		visitor.City = info.City
+		visitor.Country = info.Country
+
+	}
+
+	if err := h.service.SaveVisitor(c.Request().Context(), &visitor); err != nil {
+		log.WithError(err).Error("Failed to create message")
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "Failed to create message",
+		})
+	}
+
+	return c.JSON(http.StatusCreated, map[string]string{
+		"message": "Message created successfully",
+	})
+}
+
+func (h *analyticsHandler) GetVisitors(c echo.Context) error {
+	log := h.log.WithFields(map[string]any{
+		"layer":     "handlers",
+		"operation": "get_visitors",
+	})
+
+	limitString := c.QueryParam("limit")
+	offsetString := c.QueryParam("offset")
+
+	limit := 10
+	if limitString != "" {
+		parsedLimit, err := strconv.Atoi(limitString)
+		if err != nil || parsedLimit <= 0 || parsedLimit > 100 {
+			return c.JSON(http.StatusBadRequest, map[string]any{
+				"error": "limit must be a positive integer between 1 and 100",
+			})
+		}
+		limit = parsedLimit
+	}
+
+	offset := 0
+	if offsetString != "" {
+		parsedOffset, err := strconv.Atoi(offsetString)
+		if err != nil || parsedOffset < 0 {
+			return c.JSON(http.StatusBadRequest, map[string]any{
+				"error": "offset must be a non-negative integer",
+			})
+		}
+		offset = parsedOffset
+	}
+
+	visitors, total, unique, err := h.service.GetVisitors(c.Request().Context(), limit, offset)
+	if err != nil {
+		log.WithError(err).Error("Failed to get visitors")
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "Failed to get visitors",
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]any{
+		"visitors": visitors,
+		"total":    total,
+		"unique":   unique,
+	})
+}

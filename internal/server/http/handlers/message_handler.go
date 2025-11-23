@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -38,7 +37,7 @@ func (h *messageHandler) Create(c echo.Context) error {
 		"operation": "create_message",
 	})
 
-	var req *domain.CreateMessageRequest
+	var req domain.CreateMessageRequest
 	if err := c.Bind(&req); err != nil {
 		log.Info("Invalid request body")
 		return c.JSON(http.StatusBadRequest, map[string]string{
@@ -62,9 +61,7 @@ func (h *messageHandler) Create(c echo.Context) error {
 		req.Country = info.Country
 	}
 
-	fmt.Println(info)
-
-	if err := h.messageService.CreateMessage(c.Request().Context(), req); err != nil {
+	if err := h.messageService.CreateMessage(c.Request().Context(), &req); err != nil {
 		log.WithError(err).Error("Failed to create message")
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "Failed to create message",
@@ -198,7 +195,7 @@ func (h *messageHandler) List(c echo.Context) error {
 	limitString := c.QueryParam("limit")
 	offsetString := c.QueryParam("offset")
 
-	limit := 20
+	limit := 10
 	if limitString != "" {
 		parsedLimit, err := strconv.Atoi(limitString)
 		if err != nil || parsedLimit <= 0 || parsedLimit > 100 {

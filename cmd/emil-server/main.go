@@ -67,15 +67,17 @@ func main() {
 	jwt := jwt.New(cfg.JWT)
 	hasher := hash.NewHash(10)
 
-	// Message Repository
+	// Repositories
 	messageRepository := repository.NewMessageRepository(db, log)
+	analyticsRepository := repository.NewAnalyticsRepository(db, log)
 
 	// Services
 	authService := service.NewAuthService(jwt, hasher, log)
 	messageService := service.NewMessageService(messageRepository, log)
+	analyticsService := service.NewAnalyticsService(analyticsRepository, log)
 
 	// HTTP Server
-	server := http.New(cfg.Server, log, authService, messageService, jwt)
+	server := http.New(cfg.Server, log, authService, messageService, analyticsService, jwt)
 
 	go func() {
 		if err := server.Start(); err != nil {
