@@ -25,14 +25,14 @@ func (r *analyticsRepository) SaveVisitor(ctx context.Context, visitor *domain.V
 	})
 
 	query := `
-            INSERT INTO visitors (id, ip, user_agent, city, country, time)
+            INSERT INTO visitors (id, ip, os, city, country, time)
             VALUES ($1, $2, $3, $4, $5, $6)
 		`
 
 	_, err := r.db.ExecContext(ctx, query,
 		visitor.ID,
 		visitor.IP,
-		visitor.UserAgent,
+		visitor.OS,
 		visitor.City,
 		visitor.Country,
 		visitor.Time,
@@ -55,7 +55,7 @@ func (r *analyticsRepository) GetVisitors(ctx context.Context, limit, offset int
 	})
 
 	query := `
-		SELECT id, ip, user_agent, city, country, time
+		SELECT id, ip, os, city, country, time
 		FROM visitors
 		ORDER BY time DESC
 		LIMIT $1 OFFSET $2

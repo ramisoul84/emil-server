@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -26,9 +27,29 @@ func NewAnalyticsService(analyticsRepository AnalyticsRepository, log logger.Log
 func (s *analyticsService) SaveVisitor(ctx context.Context, visitor *domain.Visitor) error {
 	visitor.ID = uuid.New()
 	visitor.Time = time.Now()
+	visitor.OS = GetOS(visitor.OS)
 	return s.analyticsRepository.SaveVisitor(ctx, visitor)
 }
 
 func (s *analyticsService) GetVisitors(ctx context.Context, limit, offset int) ([]*domain.Visitor, int, int, error) {
 	return s.analyticsRepository.GetVisitors(ctx, limit, offset)
+}
+
+func GetOS(userAgent string) string {
+	ua := strings.ToLower(userAgent)
+
+	switch {
+	case strings.Contains(ua, "windows"):
+		return "Windows"
+	case strings.Contains(ua, "mac os") || strings.Contains(ua, "macos"):
+		return "macOS"
+	case strings.Contains(ua, "linux"):
+		return "Linux"
+	case strings.Contains(ua, "android"):
+		return "Android"
+	case strings.Contains(ua, "iphone") || strings.Contains(ua, "ipad"):
+		return "iOS"
+	default:
+		return "Unknown"
+	}
 }

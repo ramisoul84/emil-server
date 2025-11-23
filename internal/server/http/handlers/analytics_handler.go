@@ -37,7 +37,7 @@ func (h *analyticsHandler) TrackVisitor(c echo.Context) error {
 	var visitor domain.Visitor
 
 	visitor.IP = ip
-	visitor.UserAgent = userAgent
+	visitor.OS = userAgent
 
 	info, err := location.GetFullClientInfo(c)
 
