@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -16,8 +15,6 @@ type Tokener interface {
 func AuthMiddleware(jwt Tokener, log logger.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			// Skip auth for public routes
-			fmt.Println(c.Path())
 			if c.Path() == "/api/v1/auth/login" || c.Path() == "/api/v1/auth/refresh" {
 				return next(c)
 			}
