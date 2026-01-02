@@ -16,6 +16,10 @@ import (
 	"gitlab.com/ramisoul/emil-server/pkg/logger"
 )
 
+type BotService interface {
+	BroadcastMessage(string) (int, []error)
+}
+
 type AuthService interface {
 	Login(email, password string) (string, string, error)
 }
@@ -44,6 +48,7 @@ type Server struct {
 	authService      AuthService
 	messageService   MessageService
 	analyticsService AnalyticsService
+	bot              BotService
 	jwt              Tokener
 }
 
@@ -53,6 +58,7 @@ func New(
 	authService AuthService,
 	messageService MessageService,
 	analyticsService AnalyticsService,
+	bot BotService,
 	jwt Tokener) *Server {
 	e := echo.New()
 	e.HideBanner = true
@@ -89,7 +95,7 @@ func New(
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	server := &Server{e, srv, log, authService, messageService, analyticsService, jwt}
+	server := &Server{e, srv, log, authService, messageService, analyticsService, bot, jwt}
 
 	server.setupRoutes()
 
@@ -99,9 +105,9 @@ func New(
 func (s *Server) setupRoutes() {
 	api := s.echo.Group("/api/v1")
 
-	messageHandler := handlers.NewMessageHandler(s.messageService, s.log)
+	messageHandler := handlers.NewMessageHandler(s.messageService, s.bot, s.log)
 	authHandler := handlers.NewAuthHandler(s.authService, s.log)
-	analyticsHandler := handlers.NewAnalyticsHandler(s.analyticsService, s.log)
+	analyticsHandler := handlers.NewAnalyticsHandler(s.analyticsService, s.bot, s.log)
 
 	message := api.Group("/message")
 

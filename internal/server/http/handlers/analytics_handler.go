@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -17,12 +18,13 @@ type AnalyticsService interface {
 }
 
 type analyticsHandler struct {
-	service AnalyticsService
-	log     logger.Logger
+	service    AnalyticsService
+	botService BotService
+	log        logger.Logger
 }
 
-func NewAnalyticsHandler(service AnalyticsService, log logger.Logger) *analyticsHandler {
-	return &analyticsHandler{service, log}
+func NewAnalyticsHandler(service AnalyticsService, botService BotService, log logger.Logger) *analyticsHandler {
+	return &analyticsHandler{service, botService, log}
 }
 
 func (h *analyticsHandler) TrackVisitor(c echo.Context) error {
@@ -56,6 +58,22 @@ func (h *analyticsHandler) TrackVisitor(c echo.Context) error {
 			"error": "Failed to create message",
 		})
 	}
+
+	message := fmt.Sprintf(
+		"👋 a new visitor!\n"+
+			"Time:%s.\n"+
+			"IP:%s.\n"+
+			"OS:%s.\n"+
+			"Country:%s.\n"+
+			"City:%s",
+		visitor.Time,
+		visitor.IP,
+		visitor.OS,
+		visitor.Country,
+		visitor.City,
+	)
+
+	h.botService.BroadcastMessage(message)
 
 	return c.JSON(http.StatusCreated, map[string]string{
 		"message": "Message created successfully",

@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -14,6 +15,10 @@ import (
 	"gitlab.com/ramisoul/emil-server/pkg/logger"
 )
 
+type BotService interface {
+	BroadcastMessage(string) (int, []error)
+}
+
 type MessageService interface {
 	CreateMessage(ctx context.Context, message *domain.CreateMessageRequest) error
 	GetMessageByID(ctx context.Context, id uuid.UUID) (*domain.Message, error)
@@ -24,11 +29,12 @@ type MessageService interface {
 
 type messageHandler struct {
 	messageService MessageService
+	botService     BotService
 	log            logger.Logger
 }
 
-func NewMessageHandler(messageService MessageService, log logger.Logger) *messageHandler {
-	return &messageHandler{messageService, log}
+func NewMessageHandler(messageService MessageService, botService BotService, log logger.Logger) *messageHandler {
+	return &messageHandler{messageService, botService, log}
 }
 
 func (h *messageHandler) Create(c echo.Context) error {
@@ -67,6 +73,18 @@ func (h *messageHandler) Create(c echo.Context) error {
 			"error": "Failed to create message",
 		})
 	}
+
+	message := fmt.Sprintf(
+		"👋 You Have recieved a new message!\n"+
+			"From:%s.\n"+
+			"Email:%s.\n"+
+			"Message:%s.",
+		req.Name,
+		req.Email,
+		req.Text,
+	)
+
+	h.botService.BroadcastMessage(message)
 
 	return c.JSON(http.StatusCreated, map[string]string{
 		"message": "Message created successfully",

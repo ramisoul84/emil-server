@@ -12,6 +12,7 @@ type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	JWT      JWTConfig
+	Bot      BotConfig
 }
 
 // Server configuration
@@ -40,6 +41,11 @@ type JWTConfig struct {
 	JWTSecret          string        `env:"JWT_SECRET" envDefault:""`
 	AccessTokenExpiry  time.Duration `env:"ACCESS_TOKEN_EXPIRY" envDefault:"15m"`
 	RefreshTokenExpiry time.Duration `env:"REFRESH_TOKEN_EXPIRY" envDefault:"7d"`
+}
+
+// Bot configuration
+type BotConfig struct {
+	Token string `env:"BOT_TOKEN" envDefault:""`
 }
 
 func Load(env string) (*Config, error) {
@@ -73,9 +79,12 @@ func Load(env string) (*Config, error) {
 			Timeout:         getDurationEnv("DB_TIMEOUT", 5*time.Second),
 		},
 		JWT: JWTConfig{
-			JWTSecret:          getEnv("JWT_SECRET", "your-default-secret-key-change-in-production"),
+			JWTSecret:          getEnv("JWT_SECRET", ""),
 			AccessTokenExpiry:  getDurationEnv("ACCESS_TOKEN_EXPIRY", 15*time.Minute),
 			RefreshTokenExpiry: getDurationEnv("REFRESH_TOKEN_EXPIRY", 24*7*time.Hour),
+		},
+		Bot: BotConfig{
+			Token: getEnv("BOT_TOKEN", ""),
 		},
 	}, nil
 }

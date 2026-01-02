@@ -9,6 +9,7 @@ import (
 
 	"gitlab.com/ramisoul/emil-server/config"
 	"gitlab.com/ramisoul/emil-server/internal/repository"
+	"gitlab.com/ramisoul/emil-server/internal/server/bot"
 	"gitlab.com/ramisoul/emil-server/internal/server/http"
 	"gitlab.com/ramisoul/emil-server/internal/service"
 	"gitlab.com/ramisoul/emil-server/internal/storage/postgres"
@@ -38,6 +39,14 @@ func main() {
 	}
 
 	log.Info("Configuration loaded successfully")
+
+	// Bot
+	bot, err := bot.NewBot(*cfg)
+	if err != nil {
+		log.WithError(err).Error("Failed to create a bot")
+	}
+
+	bot.Start()
 
 	// PostgreSQL Connection
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -77,7 +86,7 @@ func main() {
 	analyticsService := service.NewAnalyticsService(analyticsRepository, log)
 
 	// HTTP Server
-	server := http.New(cfg.Server, log, authService, messageService, analyticsService, jwt)
+	server := http.New(cfg.Server, log, authService, messageService, analyticsService, bot, jwt)
 
 	go func() {
 		if err := server.Start(); err != nil {
