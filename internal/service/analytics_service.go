@@ -13,6 +13,7 @@ import (
 type AnalyticsRepository interface {
 	SaveVisitor(ctx context.Context, visitor *domain.Visitor) error
 	GetVisitors(ctx context.Context, limit, offset int) ([]*domain.Visitor, int, int, error)
+	GetCountByUserId(ctx context.Context, userId string) (int, error)
 }
 
 type analyticsService struct {
@@ -33,6 +34,10 @@ func (s *analyticsService) SaveVisitor(ctx context.Context, visitor *domain.Visi
 
 func (s *analyticsService) GetVisitors(ctx context.Context, limit, offset int) ([]*domain.Visitor, int, int, error) {
 	return s.analyticsRepository.GetVisitors(ctx, limit, offset)
+}
+
+func (s *analyticsService) GetCountByUserId(ctx context.Context, userId string) (int, error) {
+	return s.analyticsRepository.GetCountByUserId(ctx, userId)
 }
 
 func GetOS(userAgent string) string {
