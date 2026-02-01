@@ -35,6 +35,7 @@ type MessageService interface {
 type AnalyticsService interface {
 	SaveVisitor(ctx context.Context, visitor *domain.Visitor) error
 	GetVisitors(ctx context.Context, limit, offset int) ([]*domain.Visitor, int, int, error)
+	GetCountByUserId(ctx context.Context, userId string) (int, error)
 }
 
 type Tokener interface {

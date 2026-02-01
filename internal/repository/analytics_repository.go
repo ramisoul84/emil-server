@@ -49,6 +49,28 @@ func (r *analyticsRepository) SaveVisitor(ctx context.Context, visitor *domain.V
 	return nil
 }
 
+func (r *analyticsRepository) GetCountByUserId(ctx context.Context, userId string) (int, error) {
+	log := r.log.WithFields(map[string]any{
+		"layer":     "repository",
+		"operation": "get_count",
+	})
+
+	query := `
+		SELECT COUNT(*)
+		FROM visitors
+			WHERE user_id=$1
+	`
+	var count int
+	err := r.db.SelectContext(ctx, &count, query, userId)
+
+	if err != nil {
+		log.WithError(err).Error("failed to get count")
+		return 0, fmt.Errorf("failed to get count: %w", err)
+	}
+
+	return count, nil
+}
+
 func (r *analyticsRepository) GetVisitors(ctx context.Context, limit, offset int) ([]*domain.Visitor, int, int, error) {
 	log := r.log.WithFields(map[string]any{
 		"layer":     "repository",
