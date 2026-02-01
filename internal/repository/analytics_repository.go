@@ -25,8 +25,8 @@ func (r *analyticsRepository) SaveVisitor(ctx context.Context, visitor *domain.V
 	})
 
 	query := `
-            INSERT INTO visitors (id,user_id ip, os, city, country, time)
-            VALUES ($1, $2, $3, $4, $5, $6,$7)
+            INSERT INTO visitors (id,user_id, ip, os, city, country, time)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
 		`
 
 	_, err := r.db.ExecContext(ctx, query,
