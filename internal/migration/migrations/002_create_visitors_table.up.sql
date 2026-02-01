@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS visitors (
     id UUID PRIMARY KEY,
+    user_id VARCHAR(45) NOT NULL,
     ip VARCHAR(45) NOT NULL,
     os VARCHAR(100),
     city VARCHAR(100),

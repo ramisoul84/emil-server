@@ -124,7 +124,7 @@ func (s *Server) setupRoutes() {
 	auth.POST("/login", authHandler.Login)
 
 	analytics := api.Group("/analytics")
-	analytics.GET("/track", analyticsHandler.TrackVisitor)
+	analytics.POST("/track", analyticsHandler.TrackVisitor)
 	analytics.GET("/visitors", analyticsHandler.GetVisitors)
 
 }

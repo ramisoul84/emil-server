@@ -12,6 +12,10 @@ import (
 	"gitlab.com/ramisoul/emil-server/pkg/logger"
 )
 
+type trackReq struct {
+	UserId string `json:"user_id"`
+}
+
 type AnalyticsService interface {
 	SaveVisitor(ctx context.Context, visitor *domain.Visitor) error
 	GetVisitors(ctx context.Context, limit, offset int) ([]*domain.Visitor, int, int, error)
@@ -33,11 +37,20 @@ func (h *analyticsHandler) TrackVisitor(c echo.Context) error {
 		"operation": "track_visitor",
 	})
 
+	var req trackReq
+	if err := c.Bind(&req); err != nil {
+		log.Info("Invalid request body")
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Invalid request body: " + err.Error(),
+		})
+	}
+
 	ip := c.RealIP()
 	userAgent := c.Request().UserAgent()
 
 	var visitor domain.Visitor
 
+	visitor.UserID = req.UserId
 	visitor.IP = ip
 	visitor.OS = userAgent
 
@@ -62,11 +75,13 @@ func (h *analyticsHandler) TrackVisitor(c echo.Context) error {
 	message := fmt.Sprintf(
 		"👋 a new visitor!\n"+
 			"Time:%s.\n"+
+			"User_ID:%s.\n"+
 			"IP:%s.\n"+
 			"OS:%s.\n"+
 			"Country:%s.\n"+
 			"City:%s",
 		visitor.Time,
+		visitor.UserID,
 		visitor.IP,
 		visitor.OS,
 		visitor.Country,
