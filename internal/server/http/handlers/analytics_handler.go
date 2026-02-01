@@ -74,16 +74,7 @@ func (h *analyticsHandler) TrackVisitor(c echo.Context) error {
 
 	message := fmt.Sprintf(
 		"👋 a new visitor!\n"+
-			"Time:%s.\n"+
-			"User_ID:%s.\n"+
-			"IP:%s.\n"+
-			"OS:%s.\n"+
-			"Country:%s.\n"+
-			"City:%s",
-		visitor.Time,
-		visitor.UserID,
-		visitor.IP,
-		visitor.OS,
+			"From :%s-%s.",
 		visitor.Country,
 		visitor.City,
 	)
