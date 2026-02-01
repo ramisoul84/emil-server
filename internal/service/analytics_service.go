@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -37,7 +38,13 @@ func (s *analyticsService) GetVisitors(ctx context.Context, limit, offset int) (
 }
 
 func (s *analyticsService) GetCountByUserId(ctx context.Context, userId string) (int, error) {
-	return s.analyticsRepository.GetCountByUserId(ctx, userId)
+	fmt.Println("USER ID", userId)
+	count, err := s.analyticsRepository.GetCountByUserId(ctx, userId)
+	fmt.Println("COUNT,ERR", count, err)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return count, nil
 }
 
 func GetOS(userAgent string) string {

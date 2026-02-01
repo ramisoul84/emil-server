@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -52,22 +54,32 @@ func (r *analyticsRepository) SaveVisitor(ctx context.Context, visitor *domain.V
 func (r *analyticsRepository) GetCountByUserId(ctx context.Context, userId string) (int, error) {
 	log := r.log.WithFields(map[string]any{
 		"layer":     "repository",
-		"operation": "get_count",
+		"operation": "get_count_by_user_id",
+		"user_id":   userId, // Log user ID for tracing
 	})
 
 	query := `
-		SELECT COUNT(*)
+		SELECT COUNT(*) as visitor_count
 		FROM visitors
-			WHERE user_id=$1
+		WHERE user_id = $1
 	`
+
 	var count int
-	err := r.db.SelectContext(ctx, &count, query, userId)
+	// Use GetContext for single row/result
+	err := r.db.GetContext(ctx, &count, query, userId)
 
 	if err != nil {
-		log.WithError(err).Error("failed to get count")
-		return 0, fmt.Errorf("failed to get count: %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			// No visitors for this user is valid, return 0
+			fmt.Println("no visitors found for user")
+			return 0, nil
+		}
+
+		log.WithError(err).Error("failed to get visitor count")
+		return 0, fmt.Errorf("failed to get visitor count: %w", err)
 	}
 
+	fmt.Println("successfully retrieved visitor count: ", count)
 	return count, nil
 }
 

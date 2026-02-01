@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"gitlab.com/ramisoul/emil-server/internal/domain"
@@ -73,7 +74,12 @@ func (h *analyticsHandler) TrackVisitor(c echo.Context) error {
 		})
 	}
 
-	count, _ := h.service.GetCountByUserId(c.Request().Context(), req.UserId)
+	time.Sleep(time.Second)
+
+	count, err := h.service.GetCountByUserId(c.Request().Context(), req.UserId)
+	if err != nil {
+		log.WithError(err).Error("Failed to get count")
+	}
 
 	message := fmt.Sprintf(
 		"👋 a new visitor!\n"+
