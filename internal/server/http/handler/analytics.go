@@ -26,6 +26,7 @@ func NewAnalyticsHandler(service analyticsService) *analyticsHandler {
 
 func (h *analyticsHandler) VisitStart(c *fiber.Ctx) error {
 	requestId := c.Locals("request_id").(string)
+	ip := c.Locals("ip").(string)
 
 	var data domain.VisitStartData
 	if err := c.BodyParser(&data); err != nil {
@@ -34,7 +35,7 @@ func (h *analyticsHandler) VisitStart(c *fiber.Ctx) error {
 		})
 	}
 
-	ctx := context.WithValue(c.Context(), "ip", c.IP())
+	ctx := context.WithValue(c.Context(), "ip", ip)
 	ctx = context.WithValue(ctx, "request_id", requestId)
 
 	if err := h.service.VisitStart(ctx, &data); err != nil {
@@ -50,6 +51,7 @@ func (h *analyticsHandler) VisitStart(c *fiber.Ctx) error {
 
 func (h *analyticsHandler) VisitEnd(c *fiber.Ctx) error {
 	requestId := c.Locals("request_id").(string)
+	ip := c.Locals("ip").(string)
 
 	var data domain.VisitData
 	if err := c.BodyParser(&data); err != nil {
@@ -58,7 +60,7 @@ func (h *analyticsHandler) VisitEnd(c *fiber.Ctx) error {
 		})
 	}
 
-	ctx := context.WithValue(c.Context(), "ip", c.IP())
+	ctx := context.WithValue(c.Context(), "ip", ip)
 	ctx = context.WithValue(ctx, "request_id", requestId)
 
 	if err := h.service.VisitEnd(ctx, &data); err != nil {

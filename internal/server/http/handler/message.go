@@ -28,6 +28,7 @@ func NewMessageHandler(service messageService) *messageHandler {
 
 func (h *messageHandler) Create(c *fiber.Ctx) error {
 	requestId := c.Locals("request_id").(string)
+	ip := c.Locals("ip").(string)
 
 	var data domain.Message
 	if err := c.BodyParser(&data); err != nil {
@@ -36,7 +37,7 @@ func (h *messageHandler) Create(c *fiber.Ctx) error {
 		})
 	}
 
-	ctx := context.WithValue(c.Context(), "ip", c.IP())
+	ctx := context.WithValue(c.Context(), "ip", ip)
 	ctx = context.WithValue(ctx, "request_id", requestId)
 
 	if err := h.service.CreateMessage(ctx, &data); err != nil {

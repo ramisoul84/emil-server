@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/ramisoul84/emil-server/pkg/location"
 	"github.com/ramisoul84/emil-server/pkg/logger"
 )
 
@@ -62,7 +63,10 @@ func ObservabilityMiddleware(logger logger.Logger) fiber.Handler {
 			},
 		)
 
+		ip := location.GetRealClientIP(c)
+
 		c.Locals("request_id", requestId)
+		c.Locals("ip", ip)
 
 		reqLogger.Debug().Msg("📥 HTTP Request Started")
 
