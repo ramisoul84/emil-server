@@ -56,8 +56,6 @@ func New(cfg *config.Config) Logger {
 	zlog := zerolog.New(output).
 		Level(level).
 		With().
-		//Str("service", cfg.App.Name).
-		//Str("version", cfg.App.Version).
 		Timestamp().
 		Logger()
 
