@@ -1,0 +1,12 @@
+services:
+
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: emil-server
+    restart: unless-stopped
+    ports:
+      - "8888:8888"
+    environment:
+      - APP_ENV=production
