@@ -36,5 +36,5 @@ type Stats struct {
 	UniqueUsers       int     `json:"unique_users" db:"unique_users"`
 	AvgDuration       float64 `json:"avg_duration" db:"avg_duration"`
 	AvgActiveDuration float64 `json:"avg_active_duration" db:"avg_active_duration"`
-	AvgActions        float64 `json:"total_actions_count" db:"avg_actions"`
+	AvgActions        float64 `json:"avg_actions" db:"avg_actions"`
 }

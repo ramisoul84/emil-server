@@ -6,8 +6,10 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/ramisoul84/emil-server/config"
 	"github.com/ramisoul84/emil-server/internal/server/http/middleware"
 	"github.com/ramisoul84/emil-server/pkg/logger"
@@ -73,6 +75,8 @@ func (s *Server) setupMiddlewares() {
 }
 
 func (s *Server) setupRoutes() {
+	s.app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
+
 	s.app.Get("/health", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"status":    "healthy",
