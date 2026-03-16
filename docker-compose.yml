@@ -10,3 +10,9 @@ services:
       - "8888:8888"
     environment:
       - APP_ENV=production
+    networks:
+      - dating-app_dating-net 
+
+networks:
+  dating-app_dating-net:
+    external: true

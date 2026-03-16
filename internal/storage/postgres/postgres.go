@@ -9,10 +9,17 @@ import (
 )
 
 func New(cfg *config.Config) (*sqlx.DB, error) {
-	dataSourceName := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
-		cfg.Database.User, cfg.Database.Password, cfg.Database.Host, cfg.Database.Port, cfg.Database.Name, cfg.Database.SSLMode)
+	// Fixed code - use key=value format
+	dataSourceName := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		cfg.Database.Host,
+		cfg.Database.Port,
+		cfg.Database.User,
+		cfg.Database.Password,
+		cfg.Database.Name,
+		cfg.Database.SSLMode)
 
 	db, err := sqlx.Connect("postgres", dataSourceName)
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to DB: %w", err)
 	}
